@@ -40,6 +40,11 @@ const Footer = () => {
                   Order Now
                 </Link>
               </li>
+              <li>
+                <Link to="/track-order" className="hover:text-accent transition-colors">
+                  Track Order
+                </Link>
+              </li>
             </ul>
           </div>
 
