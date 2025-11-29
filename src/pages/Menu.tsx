@@ -3,12 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import breakfastImage from "@/assets/breakfast-special.jpg";
 import lunchImage from "@/assets/lunch-special.jpg";
 import dinnerImage from "@/assets/dinner-special.jpg";
 import drinksImage from "@/assets/drinks-special.jpg";
 
 const Menu = () => {
+  const menuAnimation = useScrollAnimation();
+  const ctaAnimation = useScrollAnimation();
+  
   const menuCategories = {
     breakfast: [
       { name: "Fluffy Pancakes", description: "Stack of 3 pancakes with syrup and butter", price: "$8.99", image: breakfastImage },
@@ -68,6 +72,10 @@ const Menu = () => {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <Tabs defaultValue="breakfast" className="w-full">
+            <div 
+              ref={menuAnimation.ref}
+              className={`animate-on-scroll ${menuAnimation.isVisible ? 'is-visible' : ''}`}
+            >
             <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-2 md:grid-cols-5 mb-12 h-auto">
               <TabsTrigger value="breakfast" className="py-3">Breakfast</TabsTrigger>
               <TabsTrigger value="lunch" className="py-3">Lunch</TabsTrigger>
@@ -76,6 +84,7 @@ const Menu = () => {
               <TabsTrigger value="drinks" className="py-3">Drinks</TabsTrigger>
             </TabsList>
 
+            </div>
             {Object.entries(menuCategories).map(([category, items]) => (
               <TabsContent key={category} value={category} className="mt-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -111,7 +120,10 @@ const Menu = () => {
 
       {/* CTA Section */}
       <section className="py-16 md:py-24 bg-muted/30">
-        <div className="container mx-auto px-4 text-center">
+        <div 
+          ref={ctaAnimation.ref}
+          className={`container mx-auto px-4 text-center animate-scale-in ${ctaAnimation.isVisible ? 'is-visible' : ''}`}
+        >
           <h2 className="text-3xl md:text-4xl font-bold font-display mb-6">
             Can't Decide? Let Us Help!
           </h2>

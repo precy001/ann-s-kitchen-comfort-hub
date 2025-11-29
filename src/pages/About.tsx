@@ -1,8 +1,15 @@
 import { Heart, Target, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import kitchenImage from "@/assets/kitchen-team.jpg";
 
 const About = () => {
+  const storyAnimation = useScrollAnimation();
+  const missionAnimation = useScrollAnimation();
+  const valuesAnimation = useScrollAnimation();
+  const teamAnimation = useScrollAnimation();
+  const whyAnimation = useScrollAnimation();
+  
   const values = [
     {
       icon: Heart,
@@ -40,7 +47,10 @@ const About = () => {
       {/* Story Section */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div 
+            ref={storyAnimation.ref}
+            className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center animate-on-scroll ${storyAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             <div className="order-2 lg:order-1">
               <h2 className="text-3xl md:text-4xl font-bold font-display mb-6">
                 Welcome to ANN's Kitchen
@@ -79,7 +89,10 @@ const About = () => {
       {/* Mission Section */}
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center mb-12">
+          <div 
+            ref={missionAnimation.ref}
+            className={`max-w-3xl mx-auto text-center mb-12 animate-scale-in ${missionAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             <h2 className="text-3xl md:text-4xl font-bold font-display mb-6">
               Our Mission
             </h2>
@@ -98,7 +111,10 @@ const About = () => {
           <h2 className="text-3xl md:text-4xl font-bold font-display text-center mb-12">
             Our Core Values
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div 
+            ref={valuesAnimation.ref}
+            className={`grid grid-cols-1 md:grid-cols-3 gap-8 animate-on-scroll ${valuesAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             {values.map((value, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                 <CardContent className="pt-8">
@@ -117,7 +133,10 @@ const About = () => {
       {/* Team Section */}
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
+          <div 
+            ref={teamAnimation.ref}
+            className={`max-w-3xl mx-auto text-center animate-on-scroll ${teamAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             <h2 className="text-3xl md:text-4xl font-bold font-display mb-6">
               Meet Our Team
             </h2>
@@ -150,7 +169,10 @@ const About = () => {
       {/* Why Choose Us */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
+          <div 
+            ref={whyAnimation.ref}
+            className={`max-w-4xl mx-auto animate-scale-in ${whyAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             <h2 className="text-3xl md:text-4xl font-bold font-display text-center mb-12">
               Why Choose ANN's Kitchen?
             </h2>
