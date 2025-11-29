@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
 const TrackOrder = () => {
   const [orderId, setOrderId] = useState("");
@@ -12,6 +13,8 @@ const TrackOrder = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const formAnimation = useScrollAnimation();
+  const infoAnimation = useScrollAnimation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +57,10 @@ const TrackOrder = () => {
       {/* Track Form Section */}
       <section className="py-16">
         <div className="container mx-auto px-4 max-w-md">
-          <div className="bg-card border border-border rounded-lg p-8 shadow-lg">
+          <div 
+            ref={formAnimation.ref}
+            className={`bg-card border border-border rounded-lg p-8 shadow-lg animate-scale-in ${formAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="orderId">Order ID</Label>
@@ -130,7 +136,10 @@ const TrackOrder = () => {
 
       {/* Info Section */}
       <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4 max-w-3xl">
+        <div 
+          ref={infoAnimation.ref}
+          className={`container mx-auto px-4 max-w-3xl animate-on-scroll ${infoAnimation.isVisible ? 'is-visible' : ''}`}
+        >
           <h2 className="text-2xl font-bold font-display text-center mb-8">
             Order Status Explained
           </h2>

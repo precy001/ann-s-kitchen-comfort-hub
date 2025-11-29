@@ -6,11 +6,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { Phone, ShoppingBag, CreditCard, MapPin } from "lucide-react";
 
 const Order = () => {
   const { toast } = useToast();
   const [deliveryMethod, setDeliveryMethod] = useState("delivery");
+  const optionsAnimation = useScrollAnimation();
+  const formAnimation = useScrollAnimation();
+  const infoAnimation = useScrollAnimation();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,7 +41,10 @@ const Order = () => {
       {/* Order Options */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+          <div 
+            ref={optionsAnimation.ref}
+            className={`grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto animate-on-scroll ${optionsAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="pt-6">
                 <div className="w-16 h-16 mx-auto mb-4 hero-gradient rounded-full flex items-center justify-center">
@@ -89,7 +96,11 @@ const Order = () => {
           </div>
 
           {/* Order Form */}
-          <Card className="max-w-2xl mx-auto" id="order-form">
+          <Card 
+            ref={formAnimation.ref}
+            className={`max-w-2xl mx-auto animate-scale-in ${formAnimation.isVisible ? 'is-visible' : ''}`}
+            id="order-form"
+          >
             <CardHeader>
               <CardTitle className="text-2xl font-display">Order Details</CardTitle>
             </CardHeader>
@@ -195,7 +206,10 @@ const Order = () => {
       {/* Info Section */}
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
+          <div 
+            ref={infoAnimation.ref}
+            className={`max-w-3xl mx-auto text-center animate-on-scroll ${infoAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             <h2 className="text-3xl md:text-4xl font-bold font-display mb-6">
               Delivery Information
             </h2>

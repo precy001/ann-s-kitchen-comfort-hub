@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Package, Mail, Phone, MapPin, Clock, CheckCircle2, Truck, ChefHat, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
 interface OrderData {
   id: string;
@@ -20,6 +21,9 @@ const OrderDetails = () => {
   const [searchParams] = useSearchParams();
   const [orderData, setOrderData] = useState<OrderData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const statusAnimation = useScrollAnimation();
+  const itemsAnimation = useScrollAnimation();
+  const sidebarAnimation = useScrollAnimation();
 
   const orderId = searchParams.get("id");
   const email = searchParams.get("email");
@@ -155,7 +159,10 @@ const OrderDetails = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Status Timeline */}
-            <div className="bg-card border border-border rounded-lg p-6">
+            <div 
+              ref={statusAnimation.ref}
+              className={`bg-card border border-border rounded-lg p-6 animate-slide-left ${statusAnimation.isVisible ? 'is-visible' : ''}`}
+            >
               <h2 className="text-xl font-bold font-display mb-6">Order Status</h2>
               <div className="relative">
                 {statusSteps.map((step, index) => {
@@ -201,7 +208,10 @@ const OrderDetails = () => {
             </div>
 
             {/* Order Items */}
-            <div className="bg-card border border-border rounded-lg p-6">
+            <div 
+              ref={itemsAnimation.ref}
+              className={`bg-card border border-border rounded-lg p-6 animate-slide-left ${itemsAnimation.isVisible ? 'is-visible' : ''}`}
+            >
               <h2 className="text-xl font-bold font-display mb-6">Order Items</h2>
               <div className="space-y-4">
                 {orderData.items.map((item, index) => (
@@ -225,7 +235,10 @@ const OrderDetails = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div 
+            ref={sidebarAnimation.ref}
+            className={`space-y-6 animate-slide-right ${sidebarAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             {/* Customer Info */}
             <div className="bg-card border border-border rounded-lg p-6">
               <h3 className="font-bold mb-4">Customer Information</h3>

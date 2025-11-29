@@ -4,10 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 
 const Contact = () => {
   const { toast } = useToast();
+  const cardsAnimation = useScrollAnimation();
+  const formAnimation = useScrollAnimation();
+  const faqAnimation = useScrollAnimation();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,7 +64,10 @@ const Contact = () => {
       {/* Contact Info Cards */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <div 
+            ref={cardsAnimation.ref}
+            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 animate-on-scroll ${cardsAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             {contactInfo.map((info, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                 <CardContent className="pt-6">
@@ -84,7 +91,10 @@ const Contact = () => {
           </div>
 
           {/* Contact Form and Map */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div 
+            ref={formAnimation.ref}
+            className={`grid grid-cols-1 lg:grid-cols-2 gap-12 animate-scale-in ${formAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             {/* Contact Form */}
             <Card>
               <CardContent className="pt-6">
@@ -173,7 +183,10 @@ const Contact = () => {
       {/* FAQ Section */}
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
+          <div 
+            ref={faqAnimation.ref}
+            className={`max-w-3xl mx-auto animate-on-scroll ${faqAnimation.isVisible ? 'is-visible' : ''}`}
+          >
             <h2 className="text-3xl md:text-4xl font-bold font-display text-center mb-12">
               Frequently Asked Questions
             </h2>
