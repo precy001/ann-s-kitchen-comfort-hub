@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, ShoppingCart } from "lucide-react";
 import { Button } from "./ui/button";
+import { useCart } from "@/contexts/CartContext";
+import CartDrawer from "./CartDrawer";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const location = useLocation();
+  const { getCartCount } = useCart();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -42,6 +46,18 @@ const Navigation = () => {
                 {link.name}
               </Link>
             ))}
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative p-2 hover:text-primary transition-colors"
+              aria-label="Shopping cart"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {getCartCount() > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {getCartCount()}
+                </span>
+              )}
+            </button>
             <a href="tel:+1234567890">
               <Button size="sm" className="hero-gradient text-white hover:opacity-90 transition-opacity">
                 <Phone className="w-4 h-4 mr-2" />
@@ -50,14 +66,28 @@ const Navigation = () => {
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 text-foreground"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile Menu Button & Cart */}
+          <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative p-2 text-foreground"
+              aria-label="Shopping cart"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {getCartCount() > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {getCartCount()}
+                </span>
+              )}
+            </button>
+            <button
+              className="p-2 text-foreground"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -86,6 +116,8 @@ const Navigation = () => {
           </div>
         )}
       </div>
+      
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </nav>
   );
 };
