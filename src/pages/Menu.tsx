@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
+import { ShoppingCart } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useCart } from "@/contexts/CartContext";
 import breakfastImage from "@/assets/breakfast-special.jpg";
 import lunchImage from "@/assets/lunch-special.jpg";
 import dinnerImage from "@/assets/dinner-special.jpg";
@@ -12,6 +14,7 @@ import drinksImage from "@/assets/drinks-special.jpg";
 const Menu = () => {
   const menuAnimation = useScrollAnimation();
   const ctaAnimation = useScrollAnimation();
+  const { addToCart } = useCart();
   
   const menuCategories = {
     breakfast: [
@@ -103,11 +106,27 @@ const Menu = () => {
                       <CardContent className="p-6">
                         <h3 className="text-xl font-bold mb-2">{item.name}</h3>
                         <p className="text-muted-foreground mb-4 text-sm">{item.description}</p>
-                        <Link to="/order">
-                          <Button className="w-full hero-gradient text-white hover:opacity-90 transition-opacity">
-                            Order This
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => addToCart(
+                              `${category}-${index}`,
+                              item.name,
+                              parseFloat(item.price.replace('$', '')),
+                              item.image
+                            )}
+                            variant="outline"
+                            size="icon"
+                            className="shrink-0 hover:bg-primary hover:text-white transition-colors"
+                            aria-label="Add to cart"
+                          >
+                            <ShoppingCart className="w-4 h-4" />
                           </Button>
-                        </Link>
+                          <Link to="/order" className="flex-1">
+                            <Button className="w-full hero-gradient text-white hover:opacity-90 transition-opacity">
+                              Order Now
+                            </Button>
+                          </Link>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
