@@ -21,6 +21,7 @@ type ProductFormData = z.infer<typeof productSchema>;
 
 const Admin = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -30,6 +31,7 @@ const Admin = () => {
     resolver: zodResolver(productSchema),
   });
 
+  // ⭐ Image preview handler
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -41,30 +43,49 @@ const Admin = () => {
     }
   };
 
-  const onSubmit = (data: ProductFormData) => {
-    console.log("Product Data:", {
-      name: data.name,
-      price: data.price,
-      image: data.image[0],
-    });
-    
-    toast.success("Product uploaded successfully!");
-    
-    // Reset form and preview
-    reset();
-    setImagePreview(null);
+  // ⭐ Submit form and upload to PHP API
+  const onSubmit = async (data: ProductFormData) => {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("price", data.price);
+    formData.append("image", data.image[0]); // ⬅ FILE MUST BE HERE
+
+    try {
+      const response = await fetch("http://localhost/ann-s-kitchen-comfort-hub/backend/api/upload.php", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      console.log("API Response:", result);
+
+      if (result.status === "success") {
+        toast.success("Product uploaded successfully!");
+
+        reset();
+        setImagePreview(null);
+      } else {
+        toast.error(result?.message || "Upload failed");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong!");
+    }
   };
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Admin Dashboard
+          </h1>
           <p className="text-muted-foreground">Add new products to your menu</p>
         </div>
 
         <Card className="p-8 bg-card border border-border">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
             {/* Product Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-base font-semibold">
@@ -77,7 +98,9 @@ const Admin = () => {
                 className="h-12 text-base"
               />
               {errors.name && (
-                <p className="text-sm text-destructive">{String(errors.name.message)}</p>
+                <p className="text-sm text-destructive">
+                  {String(errors.name.message)}
+                </p>
               )}
             </div>
 
@@ -95,7 +118,9 @@ const Admin = () => {
                 className="h-12 text-base"
               />
               {errors.price && (
-                <p className="text-sm text-destructive">{String(errors.price.message)}</p>
+                <p className="text-sm text-destructive">
+                  {String(errors.price.message)}
+                </p>
               )}
             </div>
 
@@ -113,7 +138,9 @@ const Admin = () => {
                 className="h-12 text-base cursor-pointer"
               />
               {errors.image && (
-                <p className="text-sm text-destructive">{String(errors.image.message)}</p>
+                <p className="text-sm text-destructive">
+                  {String(errors.image.message)}
+                </p>
               )}
             </div>
 
