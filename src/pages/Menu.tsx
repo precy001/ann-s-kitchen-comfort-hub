@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { useCart } from "@/contexts/CartContext";
@@ -15,6 +15,7 @@ const Menu = () => {
   const menuAnimation = useScrollAnimation();
   const ctaAnimation = useScrollAnimation();
   const { addToCart } = useCart();
+  const navigate = useNavigate();
   
   const menuCategories = {
     breakfast: [
@@ -121,11 +122,20 @@ const Menu = () => {
                           >
                             <ShoppingCart className="w-4 h-4" />
                           </Button>
-                          <Link to="/order" className="flex-1">
-                            <Button className="w-full hero-gradient text-white hover:opacity-90 transition-opacity">
-                              Order Now
-                            </Button>
-                          </Link>
+                          <Button 
+                            className="w-full hero-gradient text-white hover:opacity-90 transition-opacity"
+                            onClick={() => {
+                              addToCart(
+                                `${category}-${index}`,
+                                item.name,
+                                parseFloat(item.price.replace('$', '')),
+                                item.image
+                              );
+                              navigate('/order');
+                            }}
+                          >
+                            Order Now
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
