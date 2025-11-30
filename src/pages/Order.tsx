@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,14 +7,28 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useCart } from "@/contexts/CartContext";
 import { Phone, ShoppingBag, CreditCard, MapPin } from "lucide-react";
 
 const Order = () => {
   const { toast } = useToast();
+  const { cart, getCartTotal } = useCart();
   const [deliveryMethod, setDeliveryMethod] = useState("delivery");
+  const [orderDetails, setOrderDetails] = useState("");
   const optionsAnimation = useScrollAnimation();
   const formAnimation = useScrollAnimation();
   const infoAnimation = useScrollAnimation();
+
+  // Auto-fill order details from cart
+  useEffect(() => {
+    if (cart.length > 0) {
+      const orderText = cart
+        .map((item) => `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`)
+        .join('\n');
+      const total = `\nTotal: $${getCartTotal().toFixed(2)}`;
+      setOrderDetails(orderText + total);
+    }
+  }, [cart, getCartTotal]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -164,10 +178,18 @@ const Order = () => {
                   <Label htmlFor="order">Order Details *</Label>
                   <Textarea
                     id="order"
+                    value={orderDetails}
+                    onChange={(e) => setOrderDetails(e.target.value)}
                     placeholder="Please specify what you'd like to order (e.g., 2x Jollof Rice Special, 1x Fresh Mango Smoothie)"
                     required
-                    className="min-h-[120px]"
+                    readOnly={cart.length > 0}
+                    className={`min-h-[120px] ${cart.length > 0 ? 'bg-muted cursor-not-allowed' : ''}`}
                   />
+                  {cart.length > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Order details auto-filled from your cart
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
