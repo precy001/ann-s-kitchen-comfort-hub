@@ -1,61 +1,92 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Loader2 } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { useCart } from "@/contexts/CartContext";
-import breakfastImage from "@/assets/breakfast-special.jpg";
-import lunchImage from "@/assets/lunch-special.jpg";
-import dinnerImage from "@/assets/dinner-special.jpg";
-import drinksImage from "@/assets/drinks-special.jpg";
+import { useToast } from "@/hooks/use-toast";
+
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  category: "breakfast" | "lunch" | "dinner" | "specials" | "drinks";
+  price: string;
+  image: string;
+  created_at: string;
+}
 
 const Menu = () => {
   const menuAnimation = useScrollAnimation();
   const ctaAnimation = useScrollAnimation();
   const { addToCart } = useCart();
   const navigate = useNavigate();
+  const { toast } = useToast();
   
-  const menuCategories = {
-    breakfast: [
-      { name: "Fluffy Pancakes", description: "Stack of 3 pancakes with syrup and butter", price: "$8.99", image: breakfastImage },
-      { name: "Breakfast Combo", description: "Eggs, sausage, toast, and hash browns", price: "$12.99", image: breakfastImage },
-      { name: "French Toast", description: "Three slices with fresh berries", price: "$9.99", image: breakfastImage },
-      { name: "Omelette Special", description: "Three-egg omelette with your choice of fillings", price: "$11.99", image: breakfastImage },
-      { name: "Avocado Toast", description: "Whole grain bread with fresh avocado", price: "$10.99", image: breakfastImage },
-      { name: "Breakfast Burrito", description: "Eggs, cheese, and veggies wrapped in tortilla", price: "$11.49", image: breakfastImage },
-    ],
-    lunch: [
-      { name: "Jollof Rice Special", description: "Traditional jollof with grilled chicken", price: "$15.99", image: lunchImage },
-      { name: "African Stew", description: "Hearty meat stew with vegetables", price: "$14.99", image: lunchImage },
-      { name: "Grilled Chicken Bowl", description: "Marinated chicken with rice and salad", price: "$13.99", image: lunchImage },
-      { name: "Plantain & Beans", description: "Fried plantains with seasoned black-eyed beans", price: "$12.99", image: lunchImage },
-      { name: "Suya Wrap", description: "Spicy grilled meat in soft wrap", price: "$11.99", image: lunchImage },
-      { name: "Veggie Plate", description: "Seasonal vegetables with rice", price: "$10.99", image: lunchImage },
-    ],
-    dinner: [
-      { name: "Grilled Fish Deluxe", description: "Fresh fish with aromatic rice and vegetables", price: "$18.99", image: dinnerImage },
-      { name: "Pepper Soup", description: "Spicy traditional soup with meat", price: "$16.99", image: dinnerImage },
-      { name: "Egusi Special", description: "Melon seed stew with assorted meat", price: "$17.99", image: dinnerImage },
-      { name: "Fried Rice Combo", description: "Nigerian fried rice with chicken", price: "$15.99", image: dinnerImage },
-      { name: "Surf & Turf", description: "Grilled shrimp and steak with sides", price: "$22.99", image: dinnerImage },
-      { name: "Vegetarian Feast", description: "Mixed vegetables with traditional sides", price: "$14.99", image: dinnerImage },
-    ],
-    specials: [
-      { name: "Weekend Special", description: "Chef's choice three-course meal", price: "$24.99", image: dinnerImage },
-      { name: "Family Platter", description: "Serves 4 - Mixed grill with sides", price: "$49.99", image: lunchImage },
-      { name: "Date Night Set", description: "Romantic dinner for two", price: "$39.99", image: dinnerImage },
-      { name: "Seafood Feast", description: "Mixed seafood with special sauce", price: "$27.99", image: dinnerImage },
-    ],
-    drinks: [
-      { name: "Fresh Mango Smoothie", description: "100% fresh mango blended", price: "$5.99", image: drinksImage },
-      { name: "Chapman", description: "Traditional Nigerian mocktail", price: "$4.99", image: drinksImage },
-      { name: "Zobo Drink", description: "Hibiscus tea with natural flavors", price: "$3.99", image: drinksImage },
-      { name: "Fresh Orange Juice", description: "Freshly squeezed oranges", price: "$4.99", image: drinksImage },
-      { name: "Tropical Mix", description: "Blend of tropical fruits", price: "$6.99", image: drinksImage },
-      { name: "Soft Drinks", description: "Various sodas and beverages", price: "$2.99", image: drinksImage },
-    ],
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [menuCategories, setMenuCategories] = useState<{
+    breakfast: Product[];
+    lunch: Product[];
+    dinner: Product[];
+    specials: Product[];
+    drinks: Product[];
+  }>({
+    breakfast: [],
+    lunch: [],
+    dinner: [],
+    specials: [],
+    drinks: [],
+  });
+
+  const API_BASE_URL = "http://localhost/ann-s-kitchen-comfort-hub/backend/api";
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/get_products.php`);
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        const data = await response.json();
+        setProducts(data);
+
+        // Group products by category
+        const grouped = {
+          breakfast: data.filter((p: Product) => p.category === "breakfast"),
+          lunch: data.filter((p: Product) => p.category === "lunch"),
+          dinner: data.filter((p: Product) => p.category === "dinner"),
+          specials: data.filter((p: Product) => p.category === "specials"),
+          drinks: data.filter((p: Product) => p.category === "drinks"),
+        };
+
+        setMenuCategories(grouped);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load menu items. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [toast]);
+
+  const formatPrice = (price: string) => {
+    return `₦${parseFloat(price).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  const getImageUrl = (imagePath: string) => {
+    return `${API_BASE_URL}/${imagePath}`;
   };
 
   return (
@@ -75,75 +106,87 @@ const Menu = () => {
       {/* Menu Section */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <Tabs defaultValue="breakfast" className="w-full">
-            <div 
-              ref={menuAnimation.ref}
-              className={`animate-on-scroll ${menuAnimation.isVisible ? 'is-visible' : ''}`}
-            >
-            <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-2 md:grid-cols-5 mb-12 h-auto">
-              <TabsTrigger value="breakfast" className="py-3">Breakfast</TabsTrigger>
-              <TabsTrigger value="lunch" className="py-3">Lunch</TabsTrigger>
-              <TabsTrigger value="dinner" className="py-3">Dinner</TabsTrigger>
-              <TabsTrigger value="specials" className="py-3">Specials</TabsTrigger>
-              <TabsTrigger value="drinks" className="py-3">Drinks</TabsTrigger>
-            </TabsList>
-
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="w-10 h-10 animate-spin text-primary" />
             </div>
-            {Object.entries(menuCategories).map(([category, items]) => (
-              <TabsContent key={category} value={category} className="mt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {items.map((item, index) => (
-                    <Card key={index} className="overflow-hidden group hover:shadow-xl transition-all duration-300">
-                      <div className="relative h-48 overflow-hidden">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
-                        <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full font-bold text-lg">
-                          {item.price}
-                        </div>
-                      </div>
-                      <CardContent className="p-6">
-                        <h3 className="text-xl font-bold mb-2">{item.name}</h3>
-                        <p className="text-muted-foreground mb-4 text-sm">{item.description}</p>
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => addToCart(
-                              `${category}-${index}`,
-                              item.name,
-                              parseFloat(item.price.replace('$', '')),
-                              item.image
-                            )}
-                            variant="outline"
-                            size="icon"
-                            className="shrink-0 hover:bg-primary hover:text-white transition-colors"
-                            aria-label="Add to cart"
-                          >
-                            <ShoppingCart className="w-4 h-4" />
-                          </Button>
-                          <Button 
-                            className="w-full hero-gradient text-white hover:opacity-90 transition-opacity"
-                            onClick={() => {
-                              addToCart(
-                                `${category}-${index}`,
-                                item.name,
-                                parseFloat(item.price.replace('$', '')),
-                                item.image
-                              );
-                              navigate('/order');
-                            }}
-                          >
-                            Order Now
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+          ) : (
+            <Tabs defaultValue="breakfast" className="w-full">
+              <div 
+                ref={menuAnimation.ref}
+                className={`animate-on-scroll ${menuAnimation.isVisible ? 'is-visible' : ''}`}
+              >
+                <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-2 md:grid-cols-5 mb-12 h-auto">
+                  <TabsTrigger value="breakfast" className="py-3">Breakfast</TabsTrigger>
+                  <TabsTrigger value="lunch" className="py-3">Lunch</TabsTrigger>
+                  <TabsTrigger value="dinner" className="py-3">Dinner</TabsTrigger>
+                  <TabsTrigger value="specials" className="py-3">Specials</TabsTrigger>
+                  <TabsTrigger value="drinks" className="py-3">Drinks</TabsTrigger>
+                </TabsList>
+              </div>
+              
+              {Object.entries(menuCategories).map(([category, items]) => (
+                <TabsContent key={category} value={category} className="mt-0">
+                  {items.length === 0 ? (
+                    <div className="text-center py-12">
+                      <p className="text-muted-foreground text-lg">No items available in this category yet.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {items.map((item) => (
+                        <Card key={item.id} className="overflow-hidden group hover:shadow-xl transition-all duration-300">
+                          <div className="relative h-48 overflow-hidden">
+                            <img
+                              src={getImageUrl(item.image)}
+                              alt={item.name}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            />
+                            <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full font-bold text-lg">
+                              {formatPrice(item.price)}
+                            </div>
+                          </div>
+                          <CardContent className="p-6">
+                            <h3 className="text-xl font-bold mb-2">{item.name}</h3>
+                            <p className="text-muted-foreground mb-4 text-sm">{item.description}</p>
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => addToCart(
+                                  item.id.toString(),
+                                  item.name,
+                                  parseFloat(item.price),
+                                  getImageUrl(item.image)
+                                )}
+                                variant="outline"
+                                size="icon"
+                                className="shrink-0 hover:bg-primary hover:text-white transition-colors"
+                                aria-label="Add to cart"
+                              >
+                                <ShoppingCart className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                className="w-full hero-gradient text-white hover:opacity-90 transition-opacity"
+                                onClick={() => {
+                                  addToCart(
+                                    item.id.toString(),
+                                    item.name,
+                                    parseFloat(item.price),
+                                    getImageUrl(item.image)
+                                  );
+                                  navigate('/order');
+                                }}
+                              >
+                                Order Now
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              ))}
+            </Tabs>
+          )}
         </div>
       </section>
 
