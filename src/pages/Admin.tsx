@@ -7,10 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 const productSchema = z.object({
   name: z.string().min(3, "Product name must be at least 3 characters").max(100),
+  category: z.enum(["breakfast", "lunch", "dinner", "specials", "drinks"], {
+    required_error: "Please select a category",
+  }),
   price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
     message: "Price must be a positive number",
   }),
@@ -21,12 +31,14 @@ type ProductFormData = z.infer<typeof productSchema>;
 
 const Admin = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
   });
@@ -47,6 +59,7 @@ const Admin = () => {
   const onSubmit = async (data: ProductFormData) => {
     const formData = new FormData();
     formData.append("name", data.name);
+    formData.append("category", data.category);
     formData.append("price", data.price);
     formData.append("image", data.image[0]); // ⬅ FILE MUST BE HERE
 
@@ -64,6 +77,7 @@ const Admin = () => {
 
         reset();
         setImagePreview(null);
+        setSelectedCategory("");
       } else {
         toast.error(result?.message || "Upload failed");
       }
@@ -100,6 +114,36 @@ const Admin = () => {
               {errors.name && (
                 <p className="text-sm text-destructive">
                   {String(errors.name.message)}
+                </p>
+              )}
+            </div>
+
+            {/* Category */}
+            <div className="space-y-2">
+              <Label htmlFor="category" className="text-base font-semibold">
+                Category
+              </Label>
+              <Select
+                value={selectedCategory}
+                onValueChange={(value) => {
+                  setSelectedCategory(value);
+                  setValue("category", value as "breakfast" | "lunch" | "dinner" | "specials" | "drinks");
+                }}
+              >
+                <SelectTrigger className="h-12 text-base">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="breakfast">Breakfast</SelectItem>
+                  <SelectItem value="lunch">Lunch</SelectItem>
+                  <SelectItem value="dinner">Dinner</SelectItem>
+                  <SelectItem value="specials">Specials</SelectItem>
+                  <SelectItem value="drinks">Drinks</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.category && (
+                <p className="text-sm text-destructive">
+                  {String(errors.category.message)}
                 </p>
               )}
             </div>
