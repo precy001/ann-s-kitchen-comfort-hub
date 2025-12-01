@@ -117,18 +117,13 @@ const Menu = () => {
             </div>
           ) : (
             <Tabs defaultValue="breakfast" className="w-full">
-              <div 
-                ref={menuAnimation.ref}
-                className={`animate-on-scroll ${menuAnimation.isVisible ? 'is-visible' : ''}`}
-              >
-                <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-2 md:grid-cols-5 mb-12 h-auto">
-                  <TabsTrigger value="breakfast" className="py-3">Breakfast</TabsTrigger>
-                  <TabsTrigger value="lunch" className="py-3">Lunch</TabsTrigger>
-                  <TabsTrigger value="dinner" className="py-3">Dinner</TabsTrigger>
-                  <TabsTrigger value="specials" className="py-3">Specials</TabsTrigger>
-                  <TabsTrigger value="drinks" className="py-3">Drinks</TabsTrigger>
-                </TabsList>
-              </div>
+              <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-2 md:grid-cols-5 mb-12 h-auto">
+                <TabsTrigger value="breakfast" className="py-3">Breakfast</TabsTrigger>
+                <TabsTrigger value="lunch" className="py-3">Lunch</TabsTrigger>
+                <TabsTrigger value="dinner" className="py-3">Dinner</TabsTrigger>
+                <TabsTrigger value="specials" className="py-3">Specials</TabsTrigger>
+                <TabsTrigger value="drinks" className="py-3">Drinks</TabsTrigger>
+              </TabsList>
               
               {Object.entries(menuCategories).map(([category, items]) => (
                 <TabsContent key={category} value={category} className="mt-0">
