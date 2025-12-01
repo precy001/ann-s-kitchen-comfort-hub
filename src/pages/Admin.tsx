@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,7 @@ const productSchema = z.object({
   category: z.enum(["breakfast", "lunch", "dinner", "specials", "drinks"], {
     required_error: "Please select a category",
   }),
+  description: z.string().min(10, "Description must be at least 10 characters").max(500, "Description must be less than 500 characters"),
   price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
     message: "Price must be a positive number",
   }),
@@ -60,6 +62,7 @@ const Admin = () => {
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("category", data.category);
+    formData.append("description", data.description);
     formData.append("price", data.price);
     formData.append("image", data.image[0]); // ⬅ FILE MUST BE HERE
 
@@ -144,6 +147,24 @@ const Admin = () => {
               {errors.category && (
                 <p className="text-sm text-destructive">
                   {String(errors.category.message)}
+                </p>
+              )}
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-base font-semibold">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                {...register("description")}
+                placeholder="Enter product description"
+                className="min-h-[100px] text-base"
+              />
+              {errors.description && (
+                <p className="text-sm text-destructive">
+                  {String(errors.description.message)}
                 </p>
               )}
             </div>
