@@ -16,6 +16,10 @@ const Menu = () => {
   const ctaAnimation = useScrollAnimation();
   const { addToCart } = useCart();
   const navigate = useNavigate();
+
+  const clickTest = () => {
+    console.log("Test")
+  }
   
   const menuCategories = {
     breakfast: [

@@ -1,29 +1,37 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS"); 
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header('Content-Type: application/json');
+header("Content-Type: application/json");
 
-// Basic config
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit;
+}
+
+// Upload directory
 $uploadDir = "uploads/products/";
 if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
-// Check upload
+// Check file upload
 if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-    echo json_encode(['status'=>'error','message'=>'No file uploaded or upload error']);
+    echo json_encode(['status' => 'error', 'message' => 'No file uploaded or upload error']);
     exit;
 }
 
-// Validate input (simple)
-$name = isset($_POST['name']) ? trim($_POST['name']) : '';
-$price = isset($_POST['price']) ? trim($_POST['price']) : '0';
+// Validate fields
+$name = trim($_POST['name'] ?? '');
+$price = trim($_POST['price'] ?? '0');
+$category = trim($_POST['category'] ?? '');
+$description = trim($_POST['description'] ?? '');
 
-if ($name === '') {
-    echo json_encode(['status'=>'error','message'=>'Name required']);
+
+if ($name === '' || $category === '') {
+    echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
     exit;
 }
 
-// Validate file type & size (simple)
+// Validate image type
 $allowed = ['image/jpeg','image/png','image/gif','image/webp'];
 if (!in_array($_FILES['image']['type'], $allowed)) {
     echo json_encode(['status'=>'error','message'=>'Invalid image type']);
@@ -42,29 +50,29 @@ if (!move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
 }
 
 // Save to DB
-$mysqli = new mysqli("localhost","root","","anns_kitchen");
+$mysqli = new mysqli("localhost", "root", "", "anns_kitchen");
+
 if ($mysqli->connect_errno) {
-    echo json_encode(['status'=>'error','message'=>'DB connection failed']);
+    echo json_encode(['status'=>'error','message'=>'Database connection failed']);
     exit;
 }
 
-$stmt = $mysqli->prepare("INSERT INTO products (name, price, image) VALUES (?, ?, ?)");
-if (!$stmt) {
-    echo json_encode(['status'=>'error','message'=>'DB prepare failed']);
-    exit;
-}
-$stmt->bind_param("sds", $name, $price, $targetPath);
+$stmt = $mysqli->prepare("INSERT INTO products (name, description, category, price, image) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sssds", $name, $description, $category,  $price, $targetPath);
 $exec = $stmt->execute();
+
 if (!$exec) {
-    echo json_encode(['status'=>'error','message'=>'DB insert failed']);
+    echo json_encode(['status'=>'error','message'=>'DB insert failed: '.$stmt->error]);
     exit;
 }
 
-// Return full URL (so React can use it)
-$baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://")
-           . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/';
-
+// Build image URL (for frontend)
+$baseUrl = (isset($_SERVER['HTTPS']) ? "https://" : "http://") . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/';
 $imageUrl = $baseUrl . $targetPath;
 
-echo json_encode(['status'=>'success','id'=>$stmt->insert_id,'imageUrl'=>$imageUrl]);
+echo json_encode([
+    'status' => 'success',
+    'id' => $stmt->insert_id,
+    'imageUrl' => $imageUrl
+]);
 ?>
