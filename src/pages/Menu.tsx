@@ -86,6 +86,11 @@ const Menu = () => {
   };
 
   const getImageUrl = (imagePath: string) => {
+    // If the path already contains the full URL, return it as is
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+    // Otherwise, prepend the API base URL
     return `${API_BASE_URL}/${imagePath}`;
   };
 
