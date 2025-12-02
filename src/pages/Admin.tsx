@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Upload, Package, ShoppingBag, Eye } from "lucide-react";
+import { Upload, Package, ShoppingBag, Eye, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,6 +60,7 @@ interface Order {
   order_details: string;
   amount: number;
   payment_status: string;
+  delivery_status: string;
   flutterwave_tx_id: string;
   created_at?: string;
 }
@@ -153,6 +154,26 @@ const Admin = () => {
     }).format(amount);
   };
 
+  const completeOrder = async (orderId: string) => {
+    try {
+      const response = await fetch("http://localhost/ann-s-kitchen-comfort-hub/backend/api/complete_order.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: orderId }),
+      });
+      const result = await response.json();
+      if (result.status === "success") {
+        toast.success("Order marked as completed");
+        fetchOrders();
+      } else {
+        toast.error(result.message || "Failed to complete order");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error completing order");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -203,7 +224,8 @@ const Admin = () => {
                         <TableHead>Phone</TableHead>
                         <TableHead>Method</TableHead>
                         <TableHead>Amount</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead>Payment</TableHead>
+                        <TableHead>Delivery</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -232,7 +254,26 @@ const Admin = () => {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Dialog>
+                            <Badge
+                              variant={order.delivery_status === "completed" ? "default" : "secondary"}
+                              className="capitalize"
+                            >
+                              {order.delivery_status || "pending"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {order.delivery_status !== "completed" && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => completeOrder(order.order_id)}
+                                  className="text-green-600 hover:text-green-700"
+                                >
+                                  <CheckCircle className="h-4 w-4" />
+                                </Button>
+                              )}
+                              <Dialog>
                               <DialogTrigger asChild>
                                 <Button variant="ghost" size="sm">
                                   <Eye className="h-4 w-4" />
@@ -290,6 +331,7 @@ const Admin = () => {
                                 </div>
                               </DialogContent>
                             </Dialog>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
