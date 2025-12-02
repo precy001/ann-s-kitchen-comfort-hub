@@ -9,7 +9,7 @@ interface OrderData {
   email: string;
   customerName: string;
   phone: string;
-  status: "confirmed" | "preparing" | "out-for-delivery" | "delivered";
+  isCompleted: boolean;
   items: Array<{ name: string; quantity: number; price: number }>;
   total: number;
   deliveryAddress: string;
@@ -57,22 +57,15 @@ const OrderDetails = () => {
             items = [];
           }
           
-          // Map delivery_status to status
-          let status: "confirmed" | "preparing" | "out-for-delivery" | "delivered" = "confirmed";
-          if (order.delivery_status === "completed") {
-            status = "delivered";
-          } else if (order.delivery_status === "out-for-delivery") {
-            status = "out-for-delivery";
-          } else if (order.delivery_status === "preparing") {
-            status = "preparing";
-          }
+          // Map delivery_status to isCompleted boolean
+          const isCompleted = order.delivery_status === "completed";
           
           setOrderData({
             id: order.order_id,
             email: order.email,
             customerName: order.name,
             phone: order.phone,
-            status,
+            isCompleted,
             items,
             total: Number(order.amount),
             deliveryAddress: order.address || "N/A",
@@ -93,34 +86,12 @@ const OrderDetails = () => {
     fetchOrder();
   }, [orderId, email]);
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return <CheckCircle2 className="w-5 h-5" />;
-      case "preparing":
-        return <ChefHat className="w-5 h-5" />;
-      case "out-for-delivery":
-        return <Truck className="w-5 h-5" />;
-      case "delivered":
-        return <Package className="w-5 h-5" />;
-      default:
-        return <Package className="w-5 h-5" />;
-    }
+  const getStatusIcon = (isCompleted: boolean) => {
+    return isCompleted ? <Package className="w-5 h-5" /> : <ChefHat className="w-5 h-5" />;
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return "Order Confirmed";
-      case "preparing":
-        return "Preparing Your Order";
-      case "out-for-delivery":
-        return "Out for Delivery";
-      case "delivered":
-        return "Delivered";
-      default:
-        return "Processing";
-    }
+  const getStatusText = (isCompleted: boolean) => {
+    return isCompleted ? "Completed" : "In Progress";
   };
 
   const statusSteps = [
@@ -130,14 +101,16 @@ const OrderDetails = () => {
     { key: "delivered", label: "Delivered", icon: Package },
   ];
 
-  const getStepStatus = (stepKey: string, currentStatus: string) => {
-    const steps = ["confirmed", "preparing", "out-for-delivery", "delivered"];
-    const currentIndex = steps.indexOf(currentStatus);
-    const stepIndex = steps.indexOf(stepKey);
-    
-    if (stepIndex < currentIndex) return "completed";
-    if (stepIndex === currentIndex) return "active";
-    return "pending";
+  const getStepStatus = (stepKey: string, isCompleted: boolean) => {
+    if (isCompleted) {
+      // All steps completed
+      return "completed";
+    } else {
+      // Only confirmed and preparing are active/completed
+      if (stepKey === "confirmed") return "completed";
+      if (stepKey === "preparing") return "active";
+      return "pending";
+    }
   };
 
   if (isLoading) {
@@ -185,9 +158,9 @@ const OrderDetails = () => {
               <p className="text-muted-foreground">Order ID: {orderData.id}</p>
             </div>
             <div className="flex items-center gap-3 px-4 py-2 bg-primary/10 rounded-lg">
-              {getStatusIcon(orderData.status)}
+              {getStatusIcon(orderData.isCompleted)}
               <span className="font-semibold text-primary">
-                {getStatusText(orderData.status)}
+                {getStatusText(orderData.isCompleted)}
               </span>
             </div>
           </div>
@@ -205,8 +178,8 @@ const OrderDetails = () => {
             >
               <h2 className="text-xl font-bold font-display mb-6">Order Status</h2>
               <div className="relative">
-                {statusSteps.map((step, index) => {
-                  const status = getStepStatus(step.key, orderData.status);
+              {statusSteps.map((step, index) => {
+                  const status = getStepStatus(step.key, orderData.isCompleted);
                   const Icon = step.icon;
                   
                   return (
