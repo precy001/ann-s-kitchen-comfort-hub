@@ -27,7 +27,7 @@ const OrderSuccess = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
-      <Card className="max-w-md w-full text-center animate-scale-in">
+      <Card className="max-w-md w-full text-center">
         <CardContent className="pt-10 pb-8 px-6 space-y-6">
           {/* Success Icon */}
           <div className="w-20 h-20 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
