@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FlutterWaveButton, closePaymentModal } from "flutterwave-react-v3";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +14,8 @@ import { Phone, ShoppingBag, CreditCard, MapPin } from "lucide-react";
 
 const Order = () => {
   const { toast } = useToast();
-  const { cart, getCartTotal } = useCart();
+  const navigate = useNavigate();
+  const { cart, getCartTotal, clearCart } = useCart();
   const [deliveryMethod, setDeliveryMethod] = useState("delivery");
   const [orderDetails, setOrderDetails] = useState("");
   const optionsAnimation = useScrollAnimation();
@@ -93,14 +95,9 @@ const Order = () => {
       console.log("SERVER RESPONSE:", result);
 
       if (result.status === "success") {
-        toast({
-          title: "Order Successful!",
-          description: "Your payment was received and your order is being processed.",
-        });
-
-        setFormData({ name: "", phone: "", email: "", address: "", notes: "" });
-        setDeliveryMethod("delivery");
-        setOrderDetails("");
+        clearCart();
+        const orderId = result.order_id || response.tx_ref || `ORD-${Date.now()}`;
+        navigate(`/order-success?orderId=${orderId}`);
       } else {
         toast({
           title: "Server Error",
