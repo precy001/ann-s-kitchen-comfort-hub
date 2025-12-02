@@ -30,12 +30,33 @@ const TrackOrder = () => {
 
     setIsLoading(true);
     
-    // Simulate API call - replace with actual backend call
-    setTimeout(() => {
+    try {
+      const response = await fetch("http://localhost/ann-s-kitchen-comfort-hub/backend/api/track_order.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: orderId.trim(), email: email.trim() }),
+      });
+      const result = await response.json();
+      
+      if (result.status === "success") {
+        navigate(`/order-details?id=${encodeURIComponent(orderId)}&email=${encodeURIComponent(email)}`);
+      } else {
+        toast({
+          title: "Order Not Found",
+          description: result.message || "No order found with that Order ID and Email",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to track order. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-      // Navigate to order details page with order data
-      navigate(`/order-details?id=${encodeURIComponent(orderId)}&email=${encodeURIComponent(email)}`);
-    }, 1000);
+    }
   };
 
   return (
