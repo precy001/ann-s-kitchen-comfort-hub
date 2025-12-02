@@ -223,12 +223,12 @@ const OrderDetails = () => {
                       <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                     </div>
-                    <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-semibold">₦{(item.price * item.quantity).toFixed(2)}</p>
                   </div>
                 ))}
                 <div className="flex justify-between items-center pt-4 text-lg font-bold">
                   <span>Total</span>
-                  <span className="text-primary">${orderData.total.toFixed(2)}</span>
+                  <span className="text-primary">₦{orderData.total.toFixed(2)}</span>
                 </div>
               </div>
             </div>

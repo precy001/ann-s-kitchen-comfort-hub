@@ -47,14 +47,8 @@ const Admin = () => {
 
   // ⭐ Image preview handler
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      
-      // Update form value
-      setValue("image", files, { shouldValidate: true });
-      
-      // Set preview
+    const file = e.target.files?.[0];
+    if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);

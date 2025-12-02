@@ -47,7 +47,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                     />
                     <div className="flex-1 min-w-0">
                       <h4 className="font-semibold truncate">{item.name}</h4>
-                      <p className="text-primary font-bold">${item.price.toFixed(2)}</p>
+                      <p className="text-primary font-bold">₦{item.price.toFixed(2)}</p>
                       
                       <div className="flex items-center gap-2 mt-2">
                         <Button
@@ -85,7 +85,7 @@ const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
             <div className="border-t border-border pt-4 space-y-4">
               <div className="flex items-center justify-between text-lg font-bold">
                 <span>Subtotal:</span>
-                <span className="text-primary">${getCartTotal().toFixed(2)}</span>
+                <span className="text-primary">₦{getCartTotal().toFixed(2)}</span>
               </div>
 
               <div className="space-y-2">

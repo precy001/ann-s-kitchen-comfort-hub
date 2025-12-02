@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FlutterWaveButton, closePaymentModal } from "flutterwave-react-v3";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,23 +20,100 @@ const Order = () => {
   const formAnimation = useScrollAnimation();
   const infoAnimation = useScrollAnimation();
 
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    notes: "",
+  });
+
   // Auto-fill order details from cart
   useEffect(() => {
     if (cart.length > 0) {
       const orderText = cart
-        .map((item) => `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`)
-        .join('\n');
-      const total = `\nTotal: $${getCartTotal().toFixed(2)}`;
+        .map((item) => `${item.quantity}x ${item.name} - ₦${(item.price * item.quantity).toFixed(2)}`)
+        .join("\n");
+      const total = `\nTotal: ₦${getCartTotal().toFixed(2)}`;
       setOrderDetails(orderText + total);
     }
   }, [cart, getCartTotal]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    toast({
-      title: "Order Received!",
-      description: "We'll contact you shortly to confirm your order details.",
-    });
+  const startPayment = () => {
+    if (!formData.name || !formData.phone || !orderDetails) {
+      toast({
+        title: "Missing required fields",
+        description: "Please fill all required fields before making payment.",
+      });
+      return;
+    }
+  };
+
+  // Flutterwave config
+  const flutterwaveConfig = {
+    public_key: "FLWPUBK_TEST-21b0b895b108f56450b644d2b8356aca-X",
+    tx_ref: "tx-" + Date.now(),
+    amount: getCartTotal(),
+    currency: "NGN",
+    payment_options: "card,ussd,banktransfer",
+    customer: {
+      email: formData.email || "no-email@customer.com",
+      phone_number: formData.phone,
+      name: formData.name,
+    },
+    customizations: {
+      title: "Food Order Payment",
+      description: "Payment for food order",
+      logo: "https://your-logo-url.com/logo.png",
+    },
+  };
+
+  // Flutterwave success callback
+  const handleFlutterwaveSuccess = async (response: any) => {
+    closePaymentModal();
+    console.log("FLW Response:", response);
+
+    try {
+      const res = await fetch(
+        "http://localhost/ann-s-kitchen-comfort-hub/backend/api/submit_order.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...formData,
+            deliveryMethod,
+            orderDetails,
+            cart,
+            paymentResponse: response,
+          }),
+        }
+      );
+
+      const result = await res.json();
+      console.log("SERVER RESPONSE:", result);
+
+      if (result.status === "success") {
+        toast({
+          title: "Order Successful!",
+          description: "Your payment was received and your order is being processed.",
+        });
+
+        setFormData({ name: "", phone: "", email: "", address: "", notes: "" });
+        setDeliveryMethod("delivery");
+        setOrderDetails("");
+      } else {
+        toast({
+          title: "Server Error",
+          description: result.message || "Order could not be saved.",
+        });
+      }
+    } catch (error) {
+      console.log("ERROR:", error);
+      toast({
+        title: "Network Error",
+        description: "Unable to connect to server.",
+      });
+    }
   };
 
   return (
@@ -55,10 +133,13 @@ const Order = () => {
       {/* Order Options */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div 
+          <div
             ref={optionsAnimation.ref}
-            className={`grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto animate-on-scroll ${optionsAnimation.isVisible ? 'is-visible' : ''}`}
+            className={`grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto animate-on-scroll ${
+              optionsAnimation.isVisible ? "is-visible" : ""
+            }`}
           >
+            {/* Call Order */}
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="pt-6">
                 <div className="w-16 h-16 mx-auto mb-4 hero-gradient rounded-full flex items-center justify-center">
@@ -74,6 +155,7 @@ const Order = () => {
               </CardContent>
             </Card>
 
+            {/* WhatsApp Order */}
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="pt-6">
                 <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-accent to-secondary rounded-full flex items-center justify-center">
@@ -93,6 +175,7 @@ const Order = () => {
               </CardContent>
             </Card>
 
+            {/* Online Form */}
             <Card className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="pt-6">
                 <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-secondary to-primary rounded-full flex items-center justify-center">
@@ -100,9 +183,13 @@ const Order = () => {
                 </div>
                 <h3 className="font-bold text-lg mb-2">Online Form</h3>
                 <p className="text-sm text-muted-foreground mb-4">Fill the form below</p>
-                <Button variant="outline" className="w-full" onClick={() => {
-                  document.getElementById("order-form")?.scrollIntoView({ behavior: "smooth" });
-                }}>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    document.getElementById("order-form")?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
                   Order Now
                 </Button>
               </CardContent>
@@ -110,32 +197,54 @@ const Order = () => {
           </div>
 
           {/* Order Form */}
-          <Card 
+          <Card
             ref={formAnimation.ref}
-            className={`max-w-2xl mx-auto animate-scale-in ${formAnimation.isVisible ? 'is-visible' : ''}`}
+            className={`max-w-2xl mx-auto animate-scale-in ${formAnimation.isVisible ? "is-visible" : ""}`}
             id="order-form"
           >
             <CardHeader>
               <CardTitle className="text-2xl font-display">Order Details</CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-6">
+                {/* Name & Phone */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name *</Label>
-                    <Input id="name" placeholder="John Doe" required />
+                    <Input
+                      id="name"
+                      placeholder="John Doe"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number *</Label>
-                    <Input id="phone" type="tel" placeholder="+1 234 567 890" required />
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+1 234 567 890"
+                      required
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    />
                   </div>
                 </div>
 
+                {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" type="email" placeholder="john@example.com" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="john@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
                 </div>
 
+                {/* Delivery Method */}
                 <div className="space-y-2">
                   <Label>Delivery Method *</Label>
                   <RadioGroup value={deliveryMethod} onValueChange={setDeliveryMethod}>
@@ -162,6 +271,7 @@ const Order = () => {
                   </RadioGroup>
                 </div>
 
+                {/* Delivery Address */}
                 {deliveryMethod === "delivery" && (
                   <div className="space-y-2">
                     <Label htmlFor="address">Delivery Address *</Label>
@@ -169,21 +279,24 @@ const Order = () => {
                       id="address"
                       placeholder="Enter your full delivery address"
                       required
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       className="min-h-[100px]"
                     />
                   </div>
                 )}
 
+                {/* Order Details */}
                 <div className="space-y-2">
                   <Label htmlFor="order">Order Details *</Label>
                   <Textarea
                     id="order"
                     value={orderDetails}
                     onChange={(e) => setOrderDetails(e.target.value)}
-                    placeholder="Please specify what you'd like to order (e.g., 2x Jollof Rice Special, 1x Fresh Mango Smoothie)"
+                    placeholder="Please specify what you'd like to order"
                     required
                     readOnly={cart.length > 0}
-                    className={`min-h-[120px] ${cart.length > 0 ? 'bg-muted cursor-not-allowed' : ''}`}
+                    className={`min-h-[120px] ${cart.length > 0 ? "bg-muted cursor-not-allowed" : ""}`}
                   />
                   {cart.length > 0 && (
                     <p className="text-xs text-muted-foreground">
@@ -192,15 +305,19 @@ const Order = () => {
                   )}
                 </div>
 
+                {/* Notes */}
                 <div className="space-y-2">
                   <Label htmlFor="notes">Special Instructions</Label>
                   <Textarea
                     id="notes"
                     placeholder="Any allergies or special requests?"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     className="min-h-[80px]"
                   />
                 </div>
 
+                {/* Payment Methods Info */}
                 <div className="bg-muted/50 p-4 rounded-lg">
                   <h3 className="font-semibold mb-2">Payment Methods Accepted:</h3>
                   <ul className="text-sm text-muted-foreground space-y-1">
@@ -211,15 +328,24 @@ const Order = () => {
                   </ul>
                 </div>
 
-                <Button type="submit" className="w-full hero-gradient text-white hover:opacity-90 transition-opacity text-lg py-6">
-                  Submit Order
-                </Button>
+                {/* Flutterwave Button */}
+                <FlutterWaveButton
+                  {...flutterwaveConfig}
+                  text="Pay & Complete Order"
+                  callback={handleFlutterwaveSuccess}
+                  onClose={() =>
+                    toast({
+                      title: "Payment cancelled",
+                      description: "You closed the payment window.",
+                    })
+                  }
+                  className="w-full hero-gradient text-white hover:opacity-90 transition-opacity text-lg py-6 rounded-lg"
+                />
 
                 <p className="text-sm text-muted-foreground text-center">
-                  By submitting this form, you agree to our terms and conditions. We'll contact you 
-                  shortly to confirm your order and provide the total amount.
+                  By submitting this form, you agree to our terms and conditions. We'll contact you shortly to confirm your order and provide the total amount.
                 </p>
-              </form>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -228,13 +354,13 @@ const Order = () => {
       {/* Info Section */}
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div 
+          <div
             ref={infoAnimation.ref}
-            className={`max-w-3xl mx-auto text-center animate-on-scroll ${infoAnimation.isVisible ? 'is-visible' : ''}`}
+            className={`max-w-3xl mx-auto text-center animate-on-scroll ${
+              infoAnimation.isVisible ? "is-visible" : ""
+            }`}
           >
-            <h2 className="text-3xl md:text-4xl font-bold font-display mb-6">
-              Delivery Information
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold font-display mb-6">Delivery Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
               <div className="bg-background p-6 rounded-lg">
                 <h3 className="font-bold mb-2">Delivery Areas</h3>
@@ -251,7 +377,7 @@ const Order = () => {
               <div className="bg-background p-6 rounded-lg">
                 <h3 className="font-bold mb-2">Minimum Order</h3>
                 <p className="text-sm text-muted-foreground">
-                  Minimum order value for delivery is $15. No minimum for pickup orders.
+                  Minimum order value for delivery is ₦2000. No minimum for pickup orders.
                 </p>
               </div>
               <div className="bg-background p-6 rounded-lg">
