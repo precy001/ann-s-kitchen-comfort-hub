@@ -14,7 +14,10 @@ interface OrderData {
   total: number;
   deliveryAddress: string;
   orderDate: string;
-  estimatedDelivery: string;
+  deliveryStatus: string;
+  paymentStatus: string;
+  method: string;
+  notes: string;
 }
 
 const OrderDetails = () => {
@@ -29,28 +32,65 @@ const OrderDetails = () => {
   const email = searchParams.get("email");
 
   useEffect(() => {
-    // Simulate fetching order data from backend
-    // Replace with actual API call
-    setTimeout(() => {
-      // Mock data - replace with actual backend response
-      setOrderData({
-        id: orderId || "ORD-123456",
-        email: email || "",
-        customerName: "John Doe",
-        phone: "+1 (234) 567-890",
-        status: "preparing",
-        items: [
-          { name: "Jollof Rice with Chicken", quantity: 2, price: 15.99 },
-          { name: "Plantain Sides", quantity: 1, price: 5.99 },
-          { name: "Fresh Juice", quantity: 2, price: 3.99 },
-        ],
-        total: 45.95,
-        deliveryAddress: "123 Main Street, Apt 4B, Food City, FC 12345",
-        orderDate: "2024-01-15 14:30",
-        estimatedDelivery: "2024-01-15 15:45",
-      });
-      setIsLoading(false);
-    }, 800);
+    const fetchOrder = async () => {
+      if (!orderId || !email) {
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        const response = await fetch("http://localhost/ann-s-kitchen-comfort-hub/backend/api/track_order.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order_id: orderId, email: email }),
+        });
+        const result = await response.json();
+        
+        if (result.status === "success") {
+          const order = result.order;
+          
+          // Parse order_details JSON
+          let items: Array<{ name: string; quantity: number; price: number }> = [];
+          try {
+            items = JSON.parse(order.order_details);
+          } catch {
+            items = [];
+          }
+          
+          // Map delivery_status to status
+          let status: "confirmed" | "preparing" | "out-for-delivery" | "delivered" = "confirmed";
+          if (order.delivery_status === "completed") {
+            status = "delivered";
+          } else if (order.delivery_status === "out-for-delivery") {
+            status = "out-for-delivery";
+          } else if (order.delivery_status === "preparing") {
+            status = "preparing";
+          }
+          
+          setOrderData({
+            id: order.order_id,
+            email: order.email,
+            customerName: order.name,
+            phone: order.phone,
+            status,
+            items,
+            total: Number(order.amount),
+            deliveryAddress: order.address || "N/A",
+            orderDate: order.created_at || "N/A",
+            deliveryStatus: order.delivery_status || "pending",
+            paymentStatus: order.payment_status,
+            method: order.method,
+            notes: order.notes || "",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching order:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchOrder();
   }, [orderId, email]);
 
   const getStatusIcon = (status: string) => {
@@ -272,9 +312,9 @@ const OrderDetails = () => {
                 <div>
                   <div className="flex items-center gap-2 text-muted-foreground mb-1">
                     <Clock className="w-4 h-4" />
-                    <span>Estimated Delivery</span>
+                    <span>Delivery Method</span>
                   </div>
-                  <p className="font-medium ml-6">{orderData.estimatedDelivery}</p>
+                  <p className="font-medium ml-6 capitalize">{orderData.method}</p>
                 </div>
               </div>
             </div>
