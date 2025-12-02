@@ -5,18 +5,19 @@ Array
     [email] => iyiadeboluwatife8@gmail.com
     [address] => No 10, unity crescent, morekete, igbogbo, ikorodu, Lagos sta
 No 10, unity crescent, morekete, igbogbo, ikorodu, Lagos sta
-    [notes] => 
+    [notes] => none
     [deliveryMethod] => delivery
-    [orderDetails] => 1x Eggs Benedict - ₦4200.00
-Total: ₦4200.00
+    [orderDetails] => 1x Lamb Shank - ₦3900.00
+Total: ₦3900.00
+    [orderId] => ORD_SXBDYZRD
     [cart] => Array
         (
             [0] => Array
                 (
-                    [id] => 14
-                    [name] => Eggs Benedict
-                    [price] => 4200
-                    [image] => http://localhost/ann-s-kitchen-comfort-hub/backend/api/uploads/products/1764553627_0b7b056f8c73.jpg
+                    [id] => 23
+                    [name] => Lamb Shank
+                    [price] => 3900
+                    [image] => http://localhost/ann-s-kitchen-comfort-hub/backend/api/uploads/products/1764555314_3a3af9197239.jpeg
                     [quantity] => 1
                 )
 
@@ -32,15 +33,15 @@ Total: ₦4200.00
                     [phone_number] => +2349162542339
                 )
 
-            [transaction_id] => 9834063
-            [tx_ref] => tx-1764607894963
-            [flw_ref] => FLW-MOCK-7ba2cb2fe7c8c126a277073680c2c10b
+            [transaction_id] => 9835568
+            [tx_ref] => tx-1764678096834
+            [flw_ref] => FLW-MOCK-94950d95c0f105788c8030b3477d1c4a
             [currency] => NGN
-            [amount] => 4200
-            [charged_amount] => 4200
+            [amount] => 3900
+            [charged_amount] => 3900
             [charge_response_code] => 00
             [charge_response_message] => Please enter the OTP sent to your mobile number 080****** and email te**@rave**.com
-            [created_at] => 2025-12-02T00:45:01.000Z
+            [created_at] => 2025-12-02T12:22:09.000Z
         )
 
 )

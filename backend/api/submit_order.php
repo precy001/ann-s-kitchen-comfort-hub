@@ -56,7 +56,7 @@ if ($mysqli->connect_errno) {
     exit;
 }
 
-$order_id = uniqid('ORD-'); 
+
 
 // Prepare insert statement
 $stmt = $mysqli->prepare(
@@ -71,7 +71,7 @@ $flutterwave_tx_id = $transaction_id;
 // Bind parameters
 $stmt->bind_param(
     "ssssssssdss",
-    $order_id,
+    $data["orderId"],
     $data["name"],
     $data["phone"],
     $data["email"],

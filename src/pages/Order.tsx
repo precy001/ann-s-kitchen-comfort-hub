@@ -72,6 +72,7 @@ const Order = () => {
 
   // Flutterwave success callback
   const handleFlutterwaveSuccess = async (response: any) => {
+    const orderId = "ORD_" + Math.random().toString(36).substring(2, 10).toUpperCase();
     closePaymentModal();
     console.log("FLW Response:", response);
 
@@ -85,6 +86,7 @@ const Order = () => {
             ...formData,
             deliveryMethod,
             orderDetails,
+            orderId,
             cart,
             paymentResponse: response,
           }),
@@ -96,7 +98,8 @@ const Order = () => {
 
       if (result.status === "success") {
         clearCart();
-        const orderId = result.order_id || response.tx_ref || `ORD-${Date.now()}`;
+        console.log(orderId);
+
         navigate(`/order-success?orderId=${orderId}`);
       } else {
         toast({
