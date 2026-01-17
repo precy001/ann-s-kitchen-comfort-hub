@@ -3,7 +3,7 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 
 // CONNECT TO DATABASE
-$mysqli = new mysqli("localhost", "root", "", "anns_kitchen");
+$mysqli = new mysqli("localhost", "glamorou_ann_kitchen", "UltimateDev))@@#", "glamorou_ann_kitchen");
 
 // Check DB connection
 if ($mysqli->connect_errno) {

@@ -18,7 +18,7 @@ $order_id = trim($data["order_id"]);
 $email = trim($data["email"]);
 
 // DATABASE CONNECTION
-$mysqli = new mysqli("localhost", "root", "", "anns_kitchen");
+$mysqli = new mysqli("localhost", "glamorou_ann_kitchen", "UltimateDev))@@#", "glamorou_ann_kitchen");
 
 if ($mysqli->connect_errno) {
     echo json_encode([

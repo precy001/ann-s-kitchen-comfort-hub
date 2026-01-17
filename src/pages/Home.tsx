@@ -22,9 +22,9 @@ const Home = () => {
   ];
 
   const featuredDishes = [
-    { name: "Breakfast Special", image: breakfastImage, price: "$12.99", description: "Fluffy pancakes with eggs and fresh fruits" },
-    { name: "Lunch Delight", image: lunchImage, price: "$15.99", description: "Traditional African stew with seasoned meat" },
-    { name: "Dinner Premium", image: dinnerImage, price: "$18.99", description: "Grilled fish with aromatic rice and vegetables" },
+    { name: "Breakfast Special", image: breakfastImage, price: "₦6,000", description: "Fluffy pancakes with eggs and fresh fruits" },
+    { name: "Lunch Delight", image: lunchImage, price: "₦4,300", description: "Traditional African stew with seasoned meat" },
+    { name: "Dinner Premium", image: dinnerImage, price: "₦5,800", description: "Grilled fish with aromatic rice and vegetables" },
   ];
 
   const testimonials = [
