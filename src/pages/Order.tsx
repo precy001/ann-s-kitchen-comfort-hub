@@ -78,7 +78,7 @@ const Order = () => {
 
     try {
       const res = await fetch(
-        "http://localhost/ann-s-kitchen-comfort-hub/backend/api/submit_order.php",
+        "https://glamoroushair.com.ng/annBackend/api/submit_order.php",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

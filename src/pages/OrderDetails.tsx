@@ -39,7 +39,7 @@ const OrderDetails = () => {
       }
       
       try {
-        const response = await fetch("http://localhost/ann-s-kitchen-comfort-hub/backend/api/track_order.php", {
+        const response = await fetch("https://glamoroushair.com.ng/annBackend/api/track_order.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ order_id: orderId, email: email }),

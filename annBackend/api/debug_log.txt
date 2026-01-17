@@ -1,0 +1,127 @@
+Array
+(
+    [name] => Iyiade Boluwatife
+    [phone] => +2349162542339
+    [email] => iyiadeboluwatife8@gmail.com
+    [address] => No 10, unity crescent, morekete, igbogbo, ikorodu, Lagos sta
+No 10, unity crescent, morekete, igbogbo, ikorodu, Lagos sta
+    [notes] => 
+    [deliveryMethod] => delivery
+    [orderDetails] => 1x Avocado Toast - ₦3000.00
+2x Breakfast Burrito - ₦6400.00
+1x Eggs Benedict - ₦4200.00
+3x Fresh Orange Juice - ₦7500.00
+1x Sparkling Water w/ Lime - ₦750.00
+1x Chef's Dessert - ₦1500.00
+2x Filet Mignon - ₦7400.00
+2x Caesar Salad - ₦4000.00
+1x Grilled Chicken Sandwich - ₦3300.00
+Total: ₦38050.00
+    [orderId] => ORD_4GNL27XZ
+    [cart] => Array
+        (
+            [0] => Array
+                (
+                    [id] => 10
+                    [name] => Avocado Toast
+                    [price] => 3000
+                    [image] => http://localhost/ann-s-kitchen-comfort-hub/backend/api/uploads/products/1764552943_f5a93e93f42a.jpg
+                    [quantity] => 1
+                )
+
+            [1] => Array
+                (
+                    [id] => 12
+                    [name] => Breakfast Burrito
+                    [price] => 3200
+                    [image] => http://localhost/ann-s-kitchen-comfort-hub/backend/api/uploads/products/1764553351_53c6df168621.jpg
+                    [quantity] => 2
+                )
+
+            [2] => Array
+                (
+                    [id] => 14
+                    [name] => Eggs Benedict
+                    [price] => 4200
+                    [image] => http://localhost/ann-s-kitchen-comfort-hub/backend/api/uploads/products/1764553627_0b7b056f8c73.jpg
+                    [quantity] => 1
+                )
+
+            [3] => Array
+                (
+                    [id] => 32
+                    [name] => Fresh Orange Juice
+                    [price] => 2500
+                    [image] => http://localhost/ann-s-kitchen-comfort-hub/backend/api/uploads/products/1764562722_37cd850e6fae.jpeg
+                    [quantity] => 3
+                )
+
+            [4] => Array
+                (
+                    [id] => 35
+                    [name] => Sparkling Water w/ Lime
+                    [price] => 750
+                    [image] => http://localhost/ann-s-kitchen-comfort-hub/backend/api/uploads/products/1764563818_161ab5c61484.jpeg
+                    [quantity] => 1
+                )
+
+            [5] => Array
+                (
+                    [id] => 28
+                    [name] => Chef's Dessert
+                    [price] => 1500
+                    [image] => http://localhost/ann-s-kitchen-comfort-hub/backend/api/uploads/products/1764561832_6da943107042.jpeg
+                    [quantity] => 1
+                )
+
+            [6] => Array
+                (
+                    [id] => 20
+                    [name] => Filet Mignon
+                    [price] => 3700
+                    [image] => http://localhost/ann-s-kitchen-comfort-hub/backend/api/uploads/products/1764554925_ca0871612214.jpeg
+                    [quantity] => 2
+                )
+
+            [7] => Array
+                (
+                    [id] => 16
+                    [name] => Caesar Salad
+                    [price] => 2000
+                    [image] => http://localhost/ann-s-kitchen-comfort-hub/backend/api/uploads/products/1764554192_b2187e453d76.jpg
+                    [quantity] => 2
+                )
+
+            [8] => Array
+                (
+                    [id] => 15
+                    [name] => Grilled Chicken Sandwich
+                    [price] => 3300
+                    [image] => http://localhost/ann-s-kitchen-comfort-hub/backend/api/uploads/products/1764554050_3a4937141ca0.jpg
+                    [quantity] => 1
+                )
+
+        )
+
+    [paymentResponse] => Array
+        (
+            [status] => successful
+            [customer] => Array
+                (
+                    [name] => Ann's restaurant
+                    [email] => ravesb_d4a0019dfc3520469c75_iyiadeboluwatife8@gmail.com
+                    [phone_number] => +2349162542339
+                )
+
+            [transaction_id] => 9878496
+            [tx_ref] => tx-1766147722420
+            [flw_ref] => FLW-MOCK-140601cafdd87b7b89cd7738f4e83e67
+            [currency] => NGN
+            [amount] => 38050
+            [charged_amount] => 38050
+            [charge_response_code] => 00
+            [charge_response_message] => Please enter the OTP sent to your mobile number 080****** and email te**@rave**.com
+            [created_at] => 2025-12-19T12:42:36.000Z
+        )
+
+)

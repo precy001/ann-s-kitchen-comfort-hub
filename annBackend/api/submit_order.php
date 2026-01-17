@@ -5,6 +5,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 // Read the JSON request
 $data = json_decode(file_get_contents("php://input"), true);
+$delivery_status = "Incomplete";
 
 if (!$data || !isset($data["paymentResponse"])) {
     echo json_encode(["status" => "error", "message" => "Invalid request"]);
@@ -61,8 +62,8 @@ if ($mysqli->connect_errno) {
 // Prepare insert statement
 $stmt = $mysqli->prepare(
     "INSERT INTO orders 
-    (order_id, name, phone, email, address, notes, `method`, order_details, amount, payment_status, flutterwave_tx_id)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    (order_id, name, phone, email, address, notes, delivery_status, `method`, order_details, amount, payment_status, flutterwave_tx_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 );
 
 $payment_status = "paid";
@@ -70,13 +71,14 @@ $flutterwave_tx_id = $transaction_id;
 
 // Bind parameters
 $stmt->bind_param(
-    "ssssssssdss",
+    "sssssssssdss",
     $data["orderId"],
     $data["name"],
     $data["phone"],
     $data["email"],
     $data["address"],
     $data["notes"],
+    $delivery_status,
     $data["deliveryMethod"],
     $data["orderDetails"],
     $amount,

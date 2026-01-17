@@ -41,7 +41,7 @@ const Menu = () => {
     drinks: [],
   });
 
-  const API_BASE_URL = "http://localhost/ann-s-kitchen-comfort-hub/backend/api";
+  const API_BASE_URL = "https://glamoroushair.com.ng/annBackend/api";
 
   useEffect(() => {
     const fetchProducts = async () => {

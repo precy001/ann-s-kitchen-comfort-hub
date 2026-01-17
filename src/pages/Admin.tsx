@@ -85,7 +85,7 @@ const Admin = () => {
   const fetchOrders = async () => {
     setLoadingOrders(true);
     try {
-      const response = await fetch("http://localhost/ann-s-kitchen-comfort-hub/backend/api/get_orders.php");
+      const response = await fetch("https://glamoroushair.com.ng/annBackend/api/get_orders.php");
       const result = await response.json();
       if (result.status === "success") {
         setOrders(result.orders);
@@ -125,7 +125,7 @@ const Admin = () => {
     formData.append("image", data.image[0]);
 
     try {
-      const response = await fetch("http://localhost/ann-s-kitchen-comfort-hub/backend/api/upload.php", {
+      const response = await fetch("https://glamoroushair.com.ng/annBackend/api/upload.php", {
         method: "POST",
         body: formData,
       });
@@ -156,7 +156,7 @@ const Admin = () => {
 
   const completeOrder = async (orderId: string) => {
     try {
-      const response = await fetch("http://localhost/ann-s-kitchen-comfort-hub/backend/api/complete_order.php", {
+      const response = await fetch("https://glamoroushair.com.ng/annBackend/api/complete_order.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ order_id: orderId }),
